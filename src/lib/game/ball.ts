@@ -1,87 +1,84 @@
 /**
- * Realistic vector football, recolourable per team colourway.
+ * Brand football, recolourable per team colourway.
  * ----------------------------------------------------------------------------
- * A single parametric SVG (classic Telstar panel layout viewed front-on) whose
- * pentagon panels are tinted from a team's flag colours. One generator feeds
- * both the brand UI (`Ball.svelte`) and the pixel-free gameplay renderer
- * (`PenaltyGame`), so every ball in the experience matches the chosen bag.
+ * The geometry is the brand ball traced from `public/assets/ball.svg`: a round
+ * body, a comet-style outer ring and a radiating emblem. One generator tints it
+ * from a team's flag colours and feeds both the brand UI (`Ball.svelte`) and the
+ * pixel-free gameplay renderer (`PenaltyGame`), so every ball matches the bag.
  */
 
 export interface Colorway {
-  /** Flag colour #1 — drives the centre panel + slider start. */
+  /** Flag colour #1. */
   c1: string;
-  /** Flag colour #2 — primary ring panels + slider middle. */
+  /** Flag colour #2. */
   c2: string;
-  /** Flag colour #3 — accent ring panels + slider end. */
+  /** Flag colour #3. */
   c3: string;
 }
 
-const DEG = Math.PI / 180;
-
-/** Points string for a regular pentagon (screen coords, y-down). */
-function pentagon(cx: number, cy: number, r: number, rotDeg: number): string {
-  const pts: string[] = [];
-  for (let i = 0; i < 5; i++) {
-    const a = (-90 + rotDeg + i * 72) * DEG;
-    pts.push(`${(cx + r * Math.cos(a)).toFixed(2)},${(cy + r * Math.sin(a)).toFixed(2)}`);
-  }
-  return pts.join(' ');
+/** Relative luminance of a #rrggbb colour (0–255 scale), for ranking flag tones. */
+function luminance(hex: string): number {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
+
+// ── Geometry traced from public/assets/ball.svg (84×85 viewBox) ───────────────
+const BALL_VIEWBOX = '0 0 84 85';
+// Outer disc — the ball body.
+const BODY =
+  'M76.4771 18.8139C89.1792 37.8323 84.3824 63.6951 65.2826 76.8041C46.1827 89.9143 19.8779 84.409 7.24211 65.0552C-5.39488 45.7001 0.0100926 20.0793 19.0301 7.37829C38.0513 -5.32399 63.775 -0.203268 76.4771 18.8139Z';
+// Comet-style outer ring + spokes — the dominant structural element.
+const RING =
+  'M64.5457 75.518C64.493 75.5523 64.4366 75.5879 64.3839 75.6222C59.8209 77.5807 55.1855 78.8051 51.4816 76.7681C49.7057 75.7913 48.143 74.0645 46.9076 71.3093C46.3229 69.8864 45.1892 69.6021 43.8067 69.8349C44.9245 75.2116 47.8635 77.8994 51.4816 78.7205C51.9621 78.8296 52.4523 78.9043 52.9524 78.9497C56.2494 79.2463 59.4005 78.43 63.0602 76.4617C61.6213 77.3356 60.1493 78.1089 58.6516 78.7855C55.9123 79.6336 53.5284 79.902 51.4816 79.6225C47.187 79.0342 44.3913 76.0291 42.9978 70.8987C42.8899 70.4722 42.7698 70.0433 42.0553 70.1425C41.6483 70.1903 41.2132 70.2712 40.7965 70.3533C40.1371 70.5311 40.0526 70.8926 40.1077 71.2064C40.294 73.5534 40.1273 75.7202 39.425 77.4545C38.523 79.6789 36.7384 81.1925 33.6878 81.4707C33.037 81.3335 32.3887 81.1815 31.7476 81.0111C33.6719 81.1227 35.3449 80.603 36.6821 79.4865C38.985 77.5586 39.5648 73.7176 39.1431 70.3693C37.4996 70.4195 36.6355 71.0238 36.5497 72.1721C36.1489 78.2241 33.1289 80.228 28.3061 79.8934L28.1271 79.8799C20.3125 77.0329 13.3018 71.7689 8.33186 64.3246C3.59845 57.2419 1.39721 49.2069 1.50874 41.2895C2.84713 35.8602 6.04482 33.4114 12.4426 35.8638C13.58 36.2903 14.4784 35.7413 15.1403 34.2166C12.0725 32.3427 8.15782 31.1931 5.44916 32.5143C3.53349 33.4445 2.21348 35.2584 1.70484 37.8076C1.78696 36.9853 1.89604 36.1641 2.02718 35.3479C4.3755 29.4993 9.40674 30.0165 14.6905 32.942C14.9724 33.1295 15.3535 33.2104 15.769 32.6663C16.0031 32.3108 16.2409 31.937 16.437 31.5742C16.7973 30.9467 16.4284 30.644 16.0583 30.3523C9.57343 25.1043 8.62111 19.1406 14.1818 12.3667C15.1366 11.4647 16.1428 10.6031 17.1969 9.78681C14.5091 12.1142 12.8434 14.5164 12.0026 17.4235C10.7844 21.6248 11.9928 26.1816 17.3807 30.0594C18.1173 28.862 18.2669 27.6695 17.1123 26.488C10.4044 19.2141 14.0838 13.3129 19.3001 8.26217C19.3761 8.21192 19.4484 8.16044 19.5219 8.11142C22.3225 6.23993 25.2738 4.76676 28.3061 3.67231C31.9315 2.36582 35.6746 1.6035 39.425 1.36573C43.4843 1.10713 47.551 1.46256 51.4816 2.40381C54.4599 3.11589 57.3586 4.16377 60.1175 5.53644C65.2896 10.3445 69.9924 15.2959 61.674 24.1851C60.8835 24.9352 60.495 25.885 60.8688 26.5162C61.1629 26.9819 61.3284 27.2491 61.6213 27.7148C67.4921 23.3468 69.0793 18.225 68.1785 14.5568C67.5828 12.1314 65.547 9.16421 63.2061 7.24615C63.6203 7.50107 64.0309 7.75967 64.4391 8.0293C70.7744 13.9575 72.3579 20.3796 62.7342 27.9624C62.228 28.3142 62.1839 28.7198 62.494 29.161C62.7342 29.5201 62.972 29.878 63.2146 30.2371C63.4855 30.622 63.8593 30.6869 64.3361 30.432C71.8934 25.8715 77.8794 26.2221 81.7328 33.6161C81.8835 34.3416 82.0135 35.066 82.1213 35.7952C81.5551 33.9298 80.4814 32.0694 78.8709 30.9173C74.3643 27.694 69.8159 28.6806 64.1486 31.6404C64.4648 32.0902 64.6511 32.3439 64.9673 32.7937C65.4085 33.3808 66.4565 33.42 67.4517 32.9751C77.6698 28.6684 81.446 35.49 82.4988 40.01C82.5074 39.9635 82.5123 39.9169 82.5221 39.8679C83.1692 53.6019 76.8106 67.3261 64.5457 75.518ZM76.8093 18.5888C70.659 9.38091 61.4839 3.40367 51.4815 1.08607C47.546 0.173002 43.483 -0.170165 39.4249 0.0786308C35.6781 0.309043 31.9375 1.04563 28.3059 2.30922C25.0237 3.45147 21.8321 5.02269 18.8085 7.04247C-0.392346 19.8659 -5.85133 45.7346 6.90755 65.2742C12.179 73.3497 19.8086 79.0352 28.3059 81.9951C31.8946 83.2439 35.6377 84.0087 39.4249 84.26C43.4401 84.5271 47.5031 84.2171 51.4815 83.3028C56.3681 82.1789 61.1248 80.1444 65.5052 77.1368C84.7906 63.9028 89.6319 37.7902 76.8093 18.5888Z';
+// Radiating emblem strokes (drawn in source order; RING sits between #3 and #4).
+const EMBLEM = [
+  'M39.0798 35.0936L39.1784 35.0864C43.2285 34.8136 47.2896 33.9652 51.3027 32.5808C53.8145 31.7155 56.3067 30.64 58.7668 29.3662C57.9866 28.0635 57.0893 27.4434 54.1103 28.5754C53.1909 29.0345 52.2529 29.4431 51.3027 29.8048C47.3389 31.313 43.1594 32.0004 39.1784 32.165C35.0951 32.3344 31.2213 31.9535 27.9971 31.3418C27.1947 31.1892 26.4305 31.0221 25.7157 30.8467C22.4643 29.2833 21.0568 29.2676 19.5889 31.2529C22.3177 32.6168 25.1352 33.6083 27.9971 34.2536C31.6465 35.0756 35.37 35.3351 39.0798 35.0936Z',
+  'M59.9871 33.2738C60.5422 32.8655 60.9801 32.6195 60.6544 32.0831C60.3917 31.6416 60.0524 31.0794 59.7428 30.6673C59.4406 30.302 58.9965 30.2885 58.4155 30.6268C56.0187 31.8925 53.6787 32.9442 51.3892 33.7929C47.1754 35.3551 43.1379 36.2309 39.2547 36.5028C35.3764 36.7746 31.6535 36.4437 28.0639 35.5913C25.2686 34.9283 22.5548 33.9492 19.9125 32.6933C19.4277 32.4362 19.012 32.4177 18.7382 32.9885C18.5161 33.3526 18.2892 33.7425 18.0696 34.1029C17.8414 34.5297 18.1374 34.9344 18.5371 35.1743C22.144 37.7734 25.3204 40.5915 28.0639 43.6334C33.4804 49.6386 37.2119 56.5183 39.2547 64.3255C39.5076 65.2936 39.7345 66.2764 39.9356 67.2728C40.0947 67.6295 40.2761 67.9554 40.714 67.9616C41.0347 67.9321 41.5602 67.8841 41.8822 67.8546C42.378 67.8115 42.6568 67.5532 42.6803 67.2076C42.2017 56.8972 45.6112 48.6804 51.3892 41.6727C53.8612 38.675 56.7663 35.8976 59.9871 33.2738Z',
+  'M17.5846 35.5798C16.7237 37.0168 17.3599 38.4759 18.631 39.5036C22.2908 42.5607 25.49 45.9534 28.1906 49.7235C31.5606 54.4266 34.1568 59.7172 35.9142 65.684C36.7481 67.3471 37.8362 68.0994 39.1773 67.9409C38.0082 60.1057 33.8412 51.8575 28.1906 45.1224C25.0307 41.356 21.4065 38.0629 17.5846 35.5798Z',
+  'M51.3982 42.8591C50.0913 44.6105 48.9081 46.5592 47.8619 48.8394C45.0769 54.906 43.7798 60.5671 43.9988 67.5617C46.4229 66.9886 46.6676 65.4036 46.8377 61.701C47.4055 57.8135 48.8763 53.2125 51.3982 48.6927C53.5518 44.8336 56.4726 41.0349 60.2586 37.7946C62.4587 35.4897 62.2152 34.4137 61.2877 33.1812C57.5005 36.3266 54.1697 39.1442 51.3982 42.8591Z'
+];
 
 /**
  * Build the football markup for a colourway.
- * `id` namespaces the gradients so multiple balls can coexist on one page.
+ * `id` namespaces the gradient so multiple balls can coexist on one page.
+ *
+ * The flag's three tones are ranked by brightness: the lightest tints the disc,
+ * the darkest the outer ring and the middle tone the radiating emblem — so all
+ * three national colours read clearly on every ball.
  */
 export function footballSvg(cw: Colorway, id = 'b'): string {
-  const cx = 50;
-  const cy = 50;
-  const R = 46;
-  const seam = '#0e131c';
-  const body = '#f6f8fc';
+  const [light, mid, dark] = [cw.c1, cw.c2, cw.c3].sort((a, b) => luminance(b) - luminance(a));
 
-  // Centre pentagon + a ring of five nestled against its edges.
-  const ringColors = [cw.c2, cw.c3, cw.c1, cw.c2, cw.c3];
-  const central = pentagon(cx, cy, 15, 0);
-  let ring = '';
-  for (let i = 0; i < 5; i++) {
-    const phi = -54 + i * 72; // central pentagon edge-midpoint directions
-    const a = phi * DEG;
-    const d = 27.5;
-    const ox = cx + d * Math.cos(a);
-    const oy = cy + d * Math.sin(a);
-    const poly = pentagon(ox, oy, 12.5, phi + 90); // a vertex points outward
-    ring += `<polygon points="${poly}" fill="${ringColors[i]}"/>`;
-    // seam linking the central edge to this panel
-    const va = (-90 + 36 + i * 72) * DEG;
-    ring += `<line x1="${(cx + 12.5 * Math.cos(va)).toFixed(2)}" y1="${(cy + 12.5 * Math.sin(va)).toFixed(2)}" x2="${ox.toFixed(2)}" y2="${oy.toFixed(2)}" stroke="${seam}" stroke-width="1.5"/>`;
-  }
+  // Source draw order: body, emblem[0..2], ring, emblem[3].
+  const path = (d: string, fill: string) =>
+    `<path fill-rule="evenodd" clip-rule="evenodd" d="${d}" fill="${fill}"/>`;
+  const parts = [
+    path(BODY, light),
+    path(EMBLEM[0], mid),
+    path(EMBLEM[1], mid),
+    path(EMBLEM[2], mid),
+    path(RING, dark),
+    path(EMBLEM[3], mid)
+  ].join('\n  ');
 
-  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Football">
+  return `<svg viewBox="${BALL_VIEWBOX}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Football">
   <defs>
-    <radialGradient id="${id}-sphere" cx="38%" cy="32%" r="72%">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.55" stop-color="${body}"/>
-      <stop offset="1" stop-color="#c2c9d6"/>
-    </radialGradient>
-    <radialGradient id="${id}-shade" cx="38%" cy="32%" r="72%">
+    <radialGradient id="${id}-shade" cx="36%" cy="30%" r="75%">
       <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
       <stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
-      <stop offset="1" stop-color="#05070c" stop-opacity="0.5"/>
+      <stop offset="1" stop-color="#05070c" stop-opacity="0.42"/>
     </radialGradient>
-    <clipPath id="${id}-clip"><circle cx="${cx}" cy="${cy}" r="${R}"/></clipPath>
   </defs>
-  <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#${id}-sphere)"/>
-  <g clip-path="url(#${id}-clip)" stroke="${seam}" stroke-width="1.6" stroke-linejoin="round">
-    <polygon points="${central}" fill="${cw.c1}"/>
-    ${ring}
-  </g>
-  <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#${id}-shade)"/>
-  <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#0e131c" stroke-width="1.4" stroke-opacity="0.55"/>
-  <ellipse cx="36" cy="32" rx="13" ry="9" fill="#ffffff" opacity="0.4"/>
+  ${parts}
+  <circle cx="42" cy="42.3" r="42" fill="url(#${id}-shade)"/>
+  <ellipse cx="30" cy="26" rx="12" ry="8" fill="#ffffff" opacity="0.3"/>
 </svg>`;
 }
 
-/** CSS gradient used to theme the power slider + CTAs in the team colourway. */
+/** CSS gradient used to theme the power slider in the team colourway. */
 export function colorwayGradient(cw: Colorway, angle = 90): string {
   return `linear-gradient(${angle}deg, ${cw.c1} 0%, ${cw.c2} 52%, ${cw.c3} 100%)`;
 }

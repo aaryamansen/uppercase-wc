@@ -79,10 +79,13 @@ canvas.pixelated {
  * ------------------------------------------------------------------ */
 .pg-box {
   position: absolute;
-  top: 0;
+  /* Slightly zoomed out: the scene sits at 92% height, centred vertically, so a
+   * little more of the pitch is visible and the goal reads a touch further away.
+   * Keep the zoom on height/top (not transform) — shake() rewrites transform. */
+  top: 4%;
   left: 50%;
   transform: translateX(-50%);
-  height: 100%;
+  height: 92%;
   aspect-ratio: 941 / 1672;
   touch-action: none;
   user-select: none;

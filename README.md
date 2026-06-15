@@ -109,10 +109,10 @@ update automatically.
 
 | Goals | Discount | Code          | Message                 |
 | ----: | -------- | ------------- | ----------------------- |
-|     0 | 5%       | `TRYAGAIN5`   | Better luck next match. |
-|     1 | 10%      | `STRIKER10`   | Nice finish.            |
-|     2 | 15%      | `PLAYMAKER15` | Strong performance.     |
-|     3 | 20%      | `HATTRICK20`  | Perfect hat trick.      |
+|     0 | 5%       | `KICKS5`      | Better luck next match. |
+|     1 | 10%      | `KICKS10`     | Nice finish.            |
+|     2 | 15%      | `KICKS15`     | Strong performance.     |
+|     3 | 20%      | `KICKS20`     | Perfect hat trick.      |
 
 ## Accessibility & performance
 

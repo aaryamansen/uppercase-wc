@@ -33,7 +33,7 @@
         </div>
       </div>
       <h2 class="font-display text-3xl font-extrabold text-cream">3 penalties.</h2>
-      <p class="mt-1 text-lg text-sand/85">Beat three keepers. How much can you save?</p>
+      <p class="mt-1 text-lg text-sand/85">Take 3 shots. The more you score, the more you save.</p>
     </div>
 
     <!-- Level ladder -->

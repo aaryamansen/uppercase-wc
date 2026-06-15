@@ -18,6 +18,8 @@
   let hint = $state(true);
 
   const grad = $derived(colorwayGradient(team.colorway));
+  // Shoot button is teal blue regardless of the chosen bag.
+  const SHOOT_BG = 'linear-gradient(135deg, #2dd4bf 0%, #14b8a6 45%, #0e7490 100%)';
   const reducedMotion =
     typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -172,7 +174,7 @@
         onclick={fire}
         disabled={!armed}
         class="mt-3 w-full rounded-2xl py-3.5 text-center font-display text-lg font-black uppercase tracking-[0.15em] text-white shadow-[0_10px_26px_-10px_rgba(0,0,0,0.8)] transition active:scale-[0.98] disabled:opacity-45 touch-target"
-        style={`background:${grad};text-shadow:0 1px 3px rgba(0,0,0,0.55)`}
+        style={`background:${SHOOT_BG};text-shadow:0 1px 3px rgba(0,0,0,0.55)`}
       >
         {armed ? 'Shoot' : '…'}
       </button>

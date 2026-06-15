@@ -56,9 +56,13 @@ const colCenter = (c: number) => POSTS.left + (c + 0.5) * COL_W;
 const rowCenter = (r: number) => POSTS.top + (r + 0.5) * ROW_H;
 
 // ── Keeper sprite metrics (content boxes measured from the PNGs) ─────────────
-const STAND = { h: 0.235, cyFromCenter: 0.444 }; // img side as frac of pitch H
-const DIVE = { h: 0.30 };
+// Sprites are drawn at 60% of the measured box so the keeper stays inside the
+// goal mouth instead of stretching past the posts/crossbar.
+const KEEPER_SCALE = 0.6;
+const STAND = { h: 0.235 * KEEPER_SCALE, cyFromCenter: 0.444 }; // img side as frac of pitch H
+const DIVE = { h: 0.3 * KEEPER_SCALE };
 const KEEPER_HOME = { x: 0.505, cy: 0.247 };
+const KEEPER_Y_OFFSET = 30; // px — nudge the whole keeper down so he sits in the mouth
 // The goal mouth is the constraint: the keeper's body centre never dives past it.
 const DIVE_CLAMP_X: [number, number] = [POSTS.left + 0.05, POSTS.right - 0.05];
 const DIVE_CY: Record<Height, number> = { top: 0.206, mid: 0.247, bottom: 0.286 };
@@ -517,7 +521,7 @@ export class PenaltyGame {
     active.style.width = `${side}px`;
     active.style.height = `${side}px`;
     const kx = this.keeper.x * W - side / 2;
-    const ky = this.keeper.y * H - side / 2;
+    const ky = this.keeper.y * H - side / 2 + KEEPER_Y_OFFSET;
     active.style.transform = `translate(${kx}px, ${ky}px) rotate(${this.keeper.rot}deg) scale(${(this.keeper.flip ? -1 : 1) * this.keeper.scale}, ${this.keeper.scale})`;
 
     // ball

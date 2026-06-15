@@ -51,28 +51,28 @@ export const TEAMS: Team[] = [
     name: 'Germany',
     tagline: 'Die Mannschaft',
     colorway: { c1: '#141414', c2: '#DD0000', c3: '#FFCE00' },
-    bag: { name: 'Adler Backpack', image: '/assets/bags/germany-1.png', accent: '#FFCE00' }
+    bag: { name: 'Kicks Black', image: '/assets/bags/germany-1.png', accent: '#FFCE00' }
   },
   {
     id: 'brazil',
     name: 'Brazil',
     tagline: 'Seleção · Samba flair',
     colorway: { c1: '#009C3B', c2: '#FFDF00', c3: '#002776' },
-    bag: { name: 'Seleção Backpack', image: '/assets/bags/brazil-1.png', accent: '#FFDF00' }
+    bag: { name: 'Kicks Yellow', image: '/assets/bags/brazil-1.png', accent: '#FFDF00' }
   },
   {
     id: 'argentina',
     name: 'Argentina',
     tagline: 'La Albiceleste',
     colorway: { c1: '#74ACDF', c2: '#FFFFFF', c3: '#F6B40E' },
-    bag: { name: 'Albiceleste Backpack', image: '/assets/bags/argentina-1.png', accent: '#74ACDF' }
+    bag: { name: 'Kicks Blue', image: '/assets/bags/argentina-1.png', accent: '#74ACDF' }
   },
   {
     id: 'portugal',
     name: 'Portugal',
     tagline: 'Seleção das Quinas',
     colorway: { c1: '#006600', c2: '#FF0000', c3: '#FFD700' },
-    bag: { name: 'Quinas Backpack', image: '/assets/bags/portugal-1.png', accent: '#E4080A' }
+    bag: { name: 'Kicks Red', image: '/assets/bags/portugal-1.png', accent: '#E4080A' }
   }
 ];
 
@@ -81,10 +81,10 @@ export const TEAMS: Team[] = [
  * Tune discount / code / copy here.
  */
 export const REWARDS: Record<number, RewardTier> = {
-  0: { goals: 0, discount: 5, code: 'TRYAGAIN5', message: 'Better luck next match.', shopUrl: DEFAULT_SHOP_URL },
-  1: { goals: 1, discount: 10, code: 'STRIKER10', message: 'Nice finish.', shopUrl: DEFAULT_SHOP_URL },
-  2: { goals: 2, discount: 15, code: 'PLAYMAKER15', message: 'Strong performance.', shopUrl: DEFAULT_SHOP_URL },
-  3: { goals: 3, discount: 20, code: 'HATTRICK20', message: 'Perfect hat trick.', shopUrl: DEFAULT_SHOP_URL }
+  0: { goals: 0, discount: 5, code: 'KICKS5', message: 'Better luck next match.', shopUrl: DEFAULT_SHOP_URL },
+  1: { goals: 1, discount: 10, code: 'KICKS10', message: 'Nice finish.', shopUrl: DEFAULT_SHOP_URL },
+  2: { goals: 2, discount: 15, code: 'KICKS15', message: 'Strong performance.', shopUrl: DEFAULT_SHOP_URL },
+  3: { goals: 3, discount: 20, code: 'KICKS20', message: 'Perfect hat trick.', shopUrl: DEFAULT_SHOP_URL }
 };
 
 export function rewardForGoals(goals: number): RewardTier {
@@ -100,7 +100,7 @@ export const TOTAL_PENALTIES = 3;
 
 /** Short label for each kick's keeper difficulty. */
 export const LEVELS = [
-  { name: 'Level 1', keeper: 'Reads a tell' },
-  { name: 'Level 2', keeper: 'Roves — dives where he leans' },
-  { name: 'Level 3', keeper: 'Picks your side, not your height' }
+  { name: 'Level 1: Easy', keeper: 'Reads a tell' },
+  { name: 'Level 2: Medium', keeper: 'Roves — dives where he leans' },
+  { name: 'Level 3: Tricky', keeper: 'Picks your side, not your height' }
 ] as const;

@@ -23,33 +23,22 @@
     {#each TEAMS as team (team.id)}
       <button
         onclick={() => choose(team)}
-        class="group relative flex flex-col items-center overflow-hidden rounded-[var(--radius-card)] border border-white/10 bg-ink-soft/80 p-3 text-center shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)] transition active:scale-[0.97] touch-target"
+        aria-label={`Pick the ${team.bag.name}`}
+        class="group relative flex items-center justify-center overflow-hidden rounded-[var(--radius-card)] border border-white/10 bg-ink-soft/80 p-3 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)] transition active:scale-[0.97] touch-target"
       >
         <span
           class="pointer-events-none absolute -top-12 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full opacity-25 blur-2xl transition group-active:opacity-45"
           style={`background:${team.bag.accent}`}
         ></span>
 
-        <div class="relative grid h-32 w-full place-items-center">
+        <div class="relative grid h-44 w-full place-items-center">
           <img
             src={team.bag.image}
             alt={team.bag.name}
-            class="h-32 w-auto object-contain drop-shadow-[0_12px_18px_rgba(0,0,0,0.55)]"
+            class="h-44 w-auto object-contain drop-shadow-[0_12px_18px_rgba(0,0,0,0.55)]"
             loading="eager"
           />
         </div>
-
-        <div class="mt-2 w-full">
-          <h2 class="font-display text-lg font-bold leading-tight text-cream">{team.name}</h2>
-          <p class="truncate text-xs text-sand/70">{team.bag.name}</p>
-        </div>
-
-        <span
-          class="mt-2 inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-ink"
-          style={`background:${team.bag.accent}`}
-        >
-          Pick →
-        </span>
       </button>
     {/each}
   </div>
