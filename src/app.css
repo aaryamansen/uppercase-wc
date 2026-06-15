@@ -1,0 +1,159 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Design tokens — modern, premium brand UI (NOT pixel art).
+ * ------------------------------------------------------------------ */
+@theme {
+  --color-ink: #0b1020;
+  --color-ink-soft: #141a30;
+  --color-cream: #f7f4ec;
+  --color-sand: #e8e0d0;
+  --color-gold: #d8b25f;
+  --color-gold-soft: #ecd9a6;
+  --color-grass: #2f9e44;
+  --color-pitch: #1f7a33;
+
+  --font-display: 'Hanken Grotesk', 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  --radius-card: 1.5rem;
+}
+
+@font-face {
+  font-family: 'PixelMono';
+  src: local('Courier New');
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--color-ink);
+  color: var(--color-cream);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+}
+
+/* Lock the app to a portrait, mobile-sized stage that is centered on
+ * larger screens so the experience always feels phone-native. */
+#app-stage {
+  width: 100%;
+  max-width: 430px;
+  min-height: 100dvh;
+  margin-inline: auto;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(120% 80% at 50% 0%, #1a2440 0%, transparent 60%),
+    linear-gradient(180deg, #10162c 0%, #0b1020 55%, #080b18 100%);
+  background-color: #0b1020;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+/* Crisp pixel art: every <canvas> in the game world renders nearest-neighbour. */
+canvas.pixelated {
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* Minimum 44x44px touch targets for primary controls. */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* ------------------------------------------------------------------ *
+ * POV penalty scene — DOM built imperatively by PenaltyGame, so these
+ * classes must be global (Svelte's scoping never reaches them).
+ * ------------------------------------------------------------------ */
+.pg-box {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 100%;
+  aspect-ratio: 941 / 1672;
+  touch-action: none;
+  user-select: none;
+}
+.pg-pitch {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.pg-keeper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  pointer-events: none;
+  filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.45));
+}
+.pg-ball {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+  pointer-events: none;
+  filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.5));
+}
+.pg-ball :global(svg) {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.pg-reticle {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.15s;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+}
+.pg-reticle svg {
+  width: 100%;
+  height: 100%;
+  stroke: currentColor;
+  stroke-linecap: round;
+}
+.pg-flash {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+}
+.pg-debug {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
