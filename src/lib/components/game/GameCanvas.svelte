@@ -96,6 +96,8 @@
 </script>
 
 <div class="relative h-[100dvh] w-full overflow-hidden">
+  <!-- Blurred pitch fill — covers the gaps above/below/beside the main scene box -->
+  <img src="/assets/pitch.png" alt="" aria-hidden="true" class="pointer-events-none absolute inset-0 h-full w-full scale-125 select-none object-cover" style="filter: blur(80px);" />
   <!-- POV scene mounts here -->
   <div bind:this={host} class="absolute inset-0"></div>
 

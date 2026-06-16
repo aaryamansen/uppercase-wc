@@ -82,3 +82,17 @@ export function footballSvg(cw: Colorway, id = 'b'): string {
 export function colorwayGradient(cw: Colorway, angle = 90): string {
   return `linear-gradient(${angle}deg, ${cw.c1} 0%, ${cw.c2} 52%, ${cw.c3} 100%)`;
 }
+
+/**
+ * Readable label colour for a button filled with the colourway gradient.
+ * Weights the mid stop (it covers most of the button width) and flips to dark
+ * ink on light gradients — e.g. Argentina's light-blue/white/gold — so the text
+ * always has enough contrast to read. Returns the text colour + a matching
+ * shadow that lifts it off the fill.
+ */
+export function colorwayTextStyle(cw: Colorway): { color: string; shadow: string } {
+  const avg = (luminance(cw.c1) + 2 * luminance(cw.c2) + luminance(cw.c3)) / 4;
+  return avg > 150
+    ? { color: '#0b0f1a', shadow: '0 1px 2px rgba(255,255,255,0.45)' }
+    : { color: '#ffffff', shadow: '0 1px 3px rgba(0,0,0,0.5)' };
+}

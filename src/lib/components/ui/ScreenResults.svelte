@@ -3,7 +3,7 @@
   import { coupon, goalsScored, muted, replaySameTeam, resetMatch, selectedTeam, shotHistory } from '$lib/stores';
   import { TOTAL_PENALTIES } from '$lib/config';
   import { Audio } from '$lib/game/audio';
-  import { colorwayGradient } from '$lib/game/ball';
+  import { colorwayGradient, colorwayTextStyle } from '$lib/game/ball';
   import Ball from './Ball.svelte';
 
   const team = $derived($selectedTeam);
@@ -57,7 +57,7 @@
           <img src={team.bag.image} alt={team.bag.name} class="h-24 w-auto object-contain drop-shadow-[0_10px_16px_rgba(0,0,0,0.5)]" />
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-xs uppercase tracking-wide text-sand/60">{team.name} · Your bag</p>
+          <p class="text-xs uppercase tracking-wide text-sand/60">Your bag</p>
           <h2 class="truncate font-display text-xl font-bold text-cream">{team.bag.name}</h2>
           <div class="mt-1 flex items-baseline gap-1">
             <span class="font-display text-4xl font-black text-gold">{reward.discount}%</span>
@@ -88,8 +88,8 @@
     <div class="mt-auto space-y-3 pt-6">
       <button
         onclick={shop}
-        class="w-full rounded-2xl py-4 text-center font-display text-lg font-black uppercase tracking-wide text-white shadow-[0_12px_30px_-8px_rgba(0,0,0,0.6)] transition active:scale-[0.98] touch-target"
-        style={`background:${colorwayGradient(team.colorway)};text-shadow:0 1px 3px rgba(0,0,0,0.5)`}
+        class="w-full rounded-2xl py-4 text-center font-display text-lg font-black uppercase tracking-wide shadow-[0_12px_30px_-8px_rgba(0,0,0,0.6)] transition active:scale-[0.98] touch-target"
+        style={`background:${colorwayGradient(team.colorway)};color:${colorwayTextStyle(team.colorway).color};text-shadow:${colorwayTextStyle(team.colorway).shadow}`}
       >
         Shop Now
       </button>

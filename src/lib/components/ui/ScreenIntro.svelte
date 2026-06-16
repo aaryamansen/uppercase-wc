@@ -2,7 +2,7 @@
   import { muted, resetMatch, screen, selectedTeam } from '$lib/stores';
   import { LEVELS } from '$lib/config';
   import { Audio } from '$lib/game/audio';
-  import { colorwayGradient } from '$lib/game/ball';
+  import { colorwayGradient, colorwayTextStyle } from '$lib/game/ball';
   import Ball from './Ball.svelte';
 
   const team = $derived($selectedTeam);
@@ -25,7 +25,6 @@
     </button>
 
     <div class="mt-10 flex flex-col items-center text-center">
-      <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gold-soft">{team.name}</p>
       <div class="relative my-5 grid place-items-center">
         <span class="absolute h-44 w-44 rounded-full opacity-30 blur-3xl" style={`background:${colorwayGradient(team.colorway)}`}></span>
         <div class="ball-float">
@@ -33,7 +32,7 @@
         </div>
       </div>
       <h2 class="font-display text-3xl font-extrabold text-cream">3 penalties.</h2>
-      <p class="mt-1 text-lg text-sand/85">Take 3 shots. The more you score, the more you save.</p>
+      <p class="mt-1 text-lg text-sand/85">The more you score, the more you save.</p>
     </div>
 
     <!-- Level ladder -->
@@ -45,7 +44,6 @@
             style={`background:${colorwayGradient(team.colorway, 135)}`}>{i + 1}</span>
           <div class="min-w-0">
             <p class="font-display text-sm font-bold text-cream">{lvl.name}</p>
-            <p class="truncate text-xs text-sand/65">Keeper {lvl.keeper.toLowerCase()}</p>
           </div>
         </div>
       {/each}
@@ -53,8 +51,8 @@
 
     <button
       onclick={takeShot}
-      class="mt-auto w-full rounded-2xl py-4 text-center font-display text-lg font-black uppercase tracking-wide text-white shadow-[0_12px_30px_-8px_rgba(0,0,0,0.6)] transition active:scale-[0.98] touch-target"
-      style={`background:${colorwayGradient(team.colorway)};text-shadow:0 1px 3px rgba(0,0,0,0.5)`}
+      class="mt-auto w-full rounded-2xl py-4 text-center font-display text-lg font-black uppercase tracking-wide shadow-[0_12px_30px_-8px_rgba(0,0,0,0.6)] transition active:scale-[0.98] touch-target"
+      style={`background:${colorwayGradient(team.colorway)};color:${colorwayTextStyle(team.colorway).color};text-shadow:${colorwayTextStyle(team.colorway).shadow}`}
     >
       Take the Shot
     </button>

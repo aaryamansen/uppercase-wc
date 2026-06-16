@@ -9,22 +9,21 @@
 </script>
 
 <section class="flex min-h-[100dvh] flex-col px-5 pb-8 pt-[max(28px,env(safe-area-inset-top))]">
-  <header class="mb-5 mt-2 text-center">
-    <p class="mb-3 inline-block rounded-full border border-gold/40 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-soft">
-      Penalty Cup · Brand Activation
-    </p>
+  <header class="mb-3 mt-2 text-center">
     <h1 class="font-display text-4xl font-extrabold leading-none tracking-tight text-cream">
-      Pick Your Bag
+      Carry Your Colours
     </h1>
-    <p class="mt-2 text-base text-sand/80">Your bag sets your ball. Score to unlock savings.</p>
+    <p class="mt-2 text-xl text-sand/80">And shoot your way to a discount.</p>
   </header>
 
-  <div class="grid flex-1 grid-cols-2 gap-3 content-center">
+  <div class="flex flex-1 flex-col justify-center">
+    <p class="mb-5 text-center text-base text-sand/60">Pick your favourite Kicks to start.</p>
+    <div class="grid grid-cols-2 gap-3">
     {#each TEAMS as team (team.id)}
       <button
         onclick={() => choose(team)}
         aria-label={`Pick the ${team.bag.name}`}
-        class="group relative flex items-center justify-center overflow-hidden rounded-[var(--radius-card)] border border-white/10 bg-ink-soft/80 p-3 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)] transition active:scale-[0.97] touch-target"
+        class="group relative flex flex-col items-center justify-center overflow-hidden rounded-[var(--radius-card)] border border-white/10 bg-ink-soft/80 p-3 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.7)] transition active:scale-[0.97] touch-target"
       >
         <span
           class="pointer-events-none absolute -top-12 left-1/2 h-32 w-32 -translate-x-1/2 rounded-full opacity-25 blur-2xl transition group-active:opacity-45"
@@ -39,9 +38,10 @@
             loading="eager"
           />
         </div>
+        <p class="mt-2 text-center text-sm font-semibold text-cream">{team.bag.name}</p>
       </button>
     {/each}
+    </div>
   </div>
 
-  <p class="mt-5 text-center text-xs text-sand/50">3 penalties · 3 keepers · win up to 20% off</p>
 </section>

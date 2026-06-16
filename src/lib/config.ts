@@ -43,7 +43,7 @@ export interface RewardTier {
 }
 
 /** Single place to point every CTA. Tiers fall back to this. */
-export const DEFAULT_SHOP_URL = 'https://example.com/shop';
+export const DEFAULT_SHOP_URL = 'https://uppercase.co.in';
 
 export const TEAMS: Team[] = [
   {
@@ -81,7 +81,7 @@ export const TEAMS: Team[] = [
  * Tune discount / code / copy here.
  */
 export const REWARDS: Record<number, RewardTier> = {
-  0: { goals: 0, discount: 5, code: 'KICKS5', message: 'Better luck next match.', shopUrl: DEFAULT_SHOP_URL },
+  0: { goals: 0, discount: 5, code: 'KICKS10', message: 'Better luck next match.', shopUrl: DEFAULT_SHOP_URL },
   1: { goals: 1, discount: 10, code: 'KICKS10', message: 'Nice finish.', shopUrl: DEFAULT_SHOP_URL },
   2: { goals: 2, discount: 15, code: 'KICKS15', message: 'Strong performance.', shopUrl: DEFAULT_SHOP_URL },
   3: { goals: 3, discount: 20, code: 'KICKS20', message: 'Perfect hat trick.', shopUrl: DEFAULT_SHOP_URL }
