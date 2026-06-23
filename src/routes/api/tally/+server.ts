@@ -13,6 +13,9 @@
  * are injected automatically when a Vercel KV / Upstash store is connected to the
  * project. With no store configured (e.g. local dev) it falls back to an
  * in-memory tally so the UI still works — that copy is per-instance and resets.
+ *
+ * Debug: GET /api/tally?debug=1 reports (without leaking secrets) whether the
+ * store env vars are visible to the function and whether a PING succeeds.
  */
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { env } from '$env/dynamic/private';
@@ -27,9 +30,13 @@ const PLAYS_KEY = 'tally:plays';
 /** Valid bag identifiers — only these may be written to, so the tally can't be spammed. */
 const BAG_IDS = new Set(TEAMS.map((t) => t.id));
 
-const REDIS_URL = env.KV_REST_API_URL ?? env.UPSTASH_REDIS_REST_URL ?? '';
-const REDIS_TOKEN = env.KV_REST_API_TOKEN ?? env.UPSTASH_REDIS_REST_TOKEN ?? '';
-const hasRedis = Boolean(REDIS_URL && REDIS_TOKEN);
+// Read lazily on each request: $env/dynamic/private is resolved at runtime, and
+// reading per-request avoids any module-load timing surprises on the platform.
+function redisCreds() {
+  const url = env.KV_REST_API_URL ?? env.UPSTASH_REDIS_REST_URL ?? '';
+  const token = env.KV_REST_API_TOKEN ?? env.UPSTASH_REDIS_REST_TOKEN ?? '';
+  return { url: url.replace(/\/$/, ''), token, configured: Boolean(url && token) };
+}
 
 // In-memory fallback for local dev / unconfigured deploys (per-instance, resets).
 const memGoals: Record<string, number> = {};
@@ -39,23 +46,30 @@ type Tally = { goals: Record<string, number>; plays: Record<string, number> };
 
 /** Run a list of Redis commands in one round trip via the Upstash REST pipeline. */
 async function pipeline(commands: (string | number)[][]): Promise<unknown[]> {
-  const res = await fetch(`${REDIS_URL}/pipeline`, {
+  const { url, token } = redisCreds();
+  const res = await fetch(`${url}/pipeline`, {
     method: 'POST',
-    headers: { authorization: `Bearer ${REDIS_TOKEN}`, 'content-type': 'application/json' },
+    headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
     body: JSON.stringify(commands)
   });
-  if (!res.ok) throw new Error(`Redis pipeline failed: ${res.status}`);
-  const out = (await res.json()) as { result?: unknown; error?: string }[];
+  const text = await res.text();
+  if (!res.ok) throw new Error(`Redis pipeline ${res.status}: ${text.slice(0, 200)}`);
+  const out = JSON.parse(text) as { result?: unknown; error?: string }[];
+  const failed = out.find((r) => r.error);
+  if (failed) throw new Error(`Redis command error: ${failed.error}`);
   return out.map((r) => r.result);
 }
 
-/** Upstash HGETALL returns a flat [field, value, …] array — fold it into a number map. */
-function toNumberMap(flat: unknown): Record<string, number> {
+/**
+ * Fold an Upstash HGETALL reply into a number map. Raw REST returns a flat
+ * [field, value, …] array, but be tolerant of an object reply too.
+ */
+function toNumberMap(reply: unknown): Record<string, number> {
   const map: Record<string, number> = {};
-  if (Array.isArray(flat)) {
-    for (let i = 0; i < flat.length; i += 2) {
-      map[String(flat[i])] = Number(flat[i + 1]) || 0;
-    }
+  if (Array.isArray(reply)) {
+    for (let i = 0; i < reply.length; i += 2) map[String(reply[i])] = Number(reply[i + 1]) || 0;
+  } else if (reply && typeof reply === 'object') {
+    for (const [k, v] of Object.entries(reply as Record<string, unknown>)) map[k] = Number(v) || 0;
   }
   return map;
 }
@@ -68,7 +82,7 @@ function normalize(raw: Record<string, number>): Record<string, number> {
 }
 
 async function readTally(): Promise<Tally> {
-  if (!hasRedis) {
+  if (!redisCreds().configured) {
     return { goals: normalize(memGoals), plays: normalize(memPlays) };
   }
   const [goals, plays] = await pipeline([
@@ -78,11 +92,37 @@ async function readTally(): Promise<Tally> {
   return { goals: normalize(toNumberMap(goals)), plays: normalize(toNumberMap(plays)) };
 }
 
-export const GET: RequestHandler = async () => {
+export const GET: RequestHandler = async ({ url }) => {
+  // Safe diagnostic — never returns the URL or token, only whether they're seen.
+  if (url.searchParams.get('debug')) {
+    const { url: redisUrl, token, configured } = redisCreds();
+    let ping: string | null = null;
+    let error: string | null = null;
+    if (configured) {
+      try {
+        const res = await fetch(`${redisUrl}/ping`, { headers: { authorization: `Bearer ${token}` } });
+        ping = `${res.status}: ${(await res.text()).slice(0, 120)}`;
+      } catch (e) {
+        error = e instanceof Error ? e.message : String(e);
+      }
+    }
+    return json({
+      configured,
+      urlPresent: Boolean(redisUrl),
+      tokenPresent: Boolean(token),
+      urlHost: redisUrl ? new URL(redisUrl).host : null,
+      source: env.KV_REST_API_URL ? 'KV_REST_API_*' : env.UPSTASH_REDIS_REST_URL ? 'UPSTASH_REDIS_REST_*' : null,
+      ping,
+      error
+    });
+  }
+
   try {
     return json(await readTally());
-  } catch {
-    // Storage hiccup must never break the coupon screen — return an empty board.
+  } catch (e) {
+    // Storage hiccup must never break the coupon screen — return an empty board,
+    // but log so it shows up in the Vercel function logs.
+    console.error('[tally] GET failed:', e);
     return json({ goals: normalize({}), plays: normalize({}) });
   }
 };
@@ -104,7 +144,7 @@ export const POST: RequestHandler = async ({ request }) => {
   }
 
   try {
-    if (!hasRedis) {
+    if (!redisCreds().configured) {
       memGoals[bagId] = (memGoals[bagId] ?? 0) + goals;
       memPlays[bagId] = (memPlays[bagId] ?? 0) + 1;
       return json({ goals: normalize(memGoals), plays: normalize(memPlays) });
@@ -119,7 +159,8 @@ export const POST: RequestHandler = async ({ request }) => {
       goals: normalize(toNumberMap(results[2])),
       plays: normalize(toNumberMap(results[3]))
     });
-  } catch {
+  } catch (e) {
+    console.error('[tally] POST failed:', e);
     return json({ error: 'storage unavailable' }, { status: 502 });
   }
 };
