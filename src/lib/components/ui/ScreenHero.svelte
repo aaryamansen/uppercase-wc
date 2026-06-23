@@ -11,7 +11,7 @@
   }
 </script>
 
-<section class="flex min-h-[100dvh] flex-col px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-[max(36px,env(safe-area-inset-top))]">
+<section class="flex min-h-[100dvh] flex-col px-5 pb-[calc(var(--brand-bar-h)+max(20px,env(safe-area-inset-bottom)))] pt-[max(36px,env(safe-area-inset-top))]">
   <header class="text-center">
     <h1 class="font-display text-4xl font-extrabold leading-[0.95] tracking-tight text-cream">
       Carry Your Colours
@@ -48,8 +48,4 @@
     {/each}
     </div>
   </div>
-
-  <footer class="mt-8 flex justify-center">
-    <img src="/assets/whitelogo.png" alt="uppercase" class="h-11 w-auto opacity-95" loading="eager" />
-  </footer>
 </section>

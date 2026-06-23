@@ -15,7 +15,7 @@
 </script>
 
 {#if team}
-  <section class="relative flex min-h-[100dvh] flex-col px-5 pb-[max(24px,env(safe-area-inset-bottom))] pt-[max(20px,env(safe-area-inset-top))]">
+  <section class="relative flex min-h-[100dvh] flex-col px-5 pb-[calc(var(--brand-bar-h)+max(24px,env(safe-area-inset-bottom)))] pt-[max(20px,env(safe-area-inset-top))]">
     <button
       onclick={resetMatch}
       class="absolute left-4 top-[max(16px,env(safe-area-inset-top))] z-10 grid h-10 w-10 place-items-center rounded-full bg-white/8 text-lg touch-target"

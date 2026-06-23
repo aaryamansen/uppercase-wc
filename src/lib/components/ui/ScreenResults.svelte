@@ -94,7 +94,7 @@
 </script>
 
 {#if team}
-  <section class="flex min-h-[100dvh] flex-col px-5 pb-[max(24px,env(safe-area-inset-bottom))] pt-[max(24px,env(safe-area-inset-top))]">
+  <section class="flex min-h-[100dvh] flex-col px-5 pb-[calc(var(--brand-bar-h)+max(24px,env(safe-area-inset-bottom)))] pt-[max(24px,env(safe-area-inset-top))]">
     <header class="text-center">
       <p class="text-xs font-semibold uppercase tracking-[0.25em] text-gold-soft">Full time</p>
       <div class="mt-2 flex items-center justify-center gap-3">

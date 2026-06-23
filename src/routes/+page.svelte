@@ -4,6 +4,7 @@
   import ScreenHero from '$lib/components/ui/ScreenHero.svelte';
   import ScreenIntro from '$lib/components/ui/ScreenIntro.svelte';
   import ScreenResults from '$lib/components/ui/ScreenResults.svelte';
+  import BrandBar from '$lib/components/ui/BrandBar.svelte';
   import GameCanvas from '$lib/components/game/GameCanvas.svelte';
 
   const team = $derived($selectedTeam);
@@ -31,3 +32,8 @@
     {/if}
   </div>
 {/key}
+
+<!-- Hovering brand bar: always visible across the UI screens, hidden in-game. -->
+{#if $screen !== 'game'}
+  <BrandBar />
+{/if}

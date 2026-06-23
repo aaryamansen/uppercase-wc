@@ -26,6 +26,9 @@
 
 :root {
   color-scheme: dark;
+  /* Reserved space at the bottom of every UI screen so content clears the
+   * fixed brand bar (see BrandBar.svelte). */
+  --brand-bar-h: 64px;
 }
 
 html,
