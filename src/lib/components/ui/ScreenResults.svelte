@@ -1,8 +1,9 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { coupon, goalsScored, muted, replaySameTeam, resetMatch, selectedTeam, shotHistory } from '$lib/stores';
+  import { coupon, goalsScored, muted, replaySameTeam, resetMatch, screen, selectedTeam, shotHistory } from '$lib/stores';
   import { TOTAL_PENALTIES } from '$lib/config';
   import { Audio } from '$lib/game/audio';
+  import { track } from '$lib/analytics';
   import { colorwayGradient, colorwayTextStyle } from '$lib/game/ball';
   import Ball from './Ball.svelte';
 
@@ -10,6 +11,13 @@
   const reward = $derived($coupon);
 
   let copied = $state(false);
+  let shareCopied = $state(false);
+  let showShareMenu = $state(false);
+
+  const shareUrl = $derived(typeof location !== 'undefined' ? location.origin : reward.shopUrl);
+  const shareText = $derived(
+    `I scored ${$goalsScored}/${TOTAL_PENALTIES} in Penalty Cup and unlocked ${reward.discount}% off the ${team?.bag.name ?? 'Kicks'}! 🎯⚽ Use code ${reward.code}.`
+  );
 
   onMount(() => {
     if (!$muted) Audio.sting();
@@ -32,6 +40,50 @@
 
   function shop() {
     window.open(reward.shopUrl, '_blank', 'noopener');
+  }
+
+  // ---- social sharing ----
+  async function share() {
+    const data = { title: 'Penalty Cup', text: shareText, url: shareUrl };
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(data);
+        track('share', { method: 'native', goals: $goalsScored });
+      } catch {
+        /* user dismissed the native sheet — nothing to do */
+      }
+      return;
+    }
+    // No native share (most desktops) → reveal explicit network options.
+    showShareMenu = !showShareMenu;
+  }
+
+  function shareTo(network: 'whatsapp' | 'x' | 'telegram') {
+    const msg = encodeURIComponent(`${shareText} ${shareUrl}`);
+    const links: Record<string, string> = {
+      whatsapp: `https://wa.me/?text=${msg}`,
+      x: `https://twitter.com/intent/tweet?text=${msg}`,
+      telegram: `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`
+    };
+    window.open(links[network], '_blank', 'noopener');
+    track('share', { method: network, goals: $goalsScored });
+  }
+
+  async function copyShare() {
+    const full = `${shareText} ${shareUrl}`;
+    try {
+      await navigator.clipboard.writeText(full);
+    } catch {
+      const ta = document.createElement('textarea');
+      ta.value = full;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    shareCopied = true;
+    setTimeout(() => (shareCopied = false), 1600);
+    track('share', { method: 'copy', goals: $goalsScored });
   }
 </script>
 
@@ -83,6 +135,42 @@
           {copied ? 'Copied!' : 'Copy'}
         </span>
       </button>
+
+      <!-- Social sharing -->
+      <button
+        onclick={share}
+        class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 py-3 font-semibold text-cream transition active:scale-[0.99] touch-target"
+        aria-label="Share your result"
+      >
+        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
+          <line x1="8.6" y1="13.5" x2="15.4" y2="17.5" /><line x1="15.4" y1="6.5" x2="8.6" y2="10.5" />
+        </svg>
+        Share my result
+      </button>
+
+      {#if showShareMenu}
+        <div class="mt-2 grid grid-cols-3 gap-2">
+          <button
+            onclick={() => shareTo('whatsapp')}
+            class="rounded-xl border border-white/12 bg-black/25 py-2.5 text-sm font-semibold text-cream transition active:scale-[0.97] touch-target"
+          >
+            WhatsApp
+          </button>
+          <button
+            onclick={() => shareTo('x')}
+            class="rounded-xl border border-white/12 bg-black/25 py-2.5 text-sm font-semibold text-cream transition active:scale-[0.97] touch-target"
+          >
+            X
+          </button>
+          <button
+            onclick={copyShare}
+            class="rounded-xl border border-white/12 bg-black/25 py-2.5 text-sm font-semibold text-cream transition active:scale-[0.97] touch-target"
+          >
+            {shareCopied ? 'Copied!' : 'Copy'}
+          </button>
+        </div>
+      {/if}
     </div>
 
     <div class="mt-auto space-y-3 pt-6">
@@ -92,6 +180,12 @@
         style={`background:${colorwayGradient(team.colorway)};color:${colorwayTextStyle(team.colorway).color};text-shadow:${colorwayTextStyle(team.colorway).shadow}`}
       >
         Shop Now
+      </button>
+      <button
+        onclick={() => screen.set('leaderboard')}
+        class="flex w-full items-center justify-center gap-2 rounded-2xl border border-gold/40 bg-gold/10 py-3.5 text-center font-display font-bold text-gold-soft transition active:scale-[0.98] touch-target"
+      >
+        🏆 Leaderboard
       </button>
       <div class="flex gap-3">
         <button

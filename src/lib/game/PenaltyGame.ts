@@ -7,8 +7,9 @@
  * • Real PNG goalkeeper sprites — standing → diving, flipped/rotated per dive.
  * • Three keepers, one per kick (see `keeperDecision`):
  *     L1 commits to a pre-chosen dive with a readable lean (a "tell").
- *     L2 roves left↔right and can only dive the way he is already moving.
- *     L3 always reads your side (L/M/R) but guesses the height.
+ *     L2 always reads your side (L/M/R) but guesses the height.
+ *     L3 (elite "wall") always reads your side AND smothers anything low or
+ *        central — only a ball lifted into the top corner reliably beats him.
  *
  * The class owns the pixel-free scene (DOM + transforms); the surrounding Svelte
  * layer owns the HUD, the colourway power slider and the result banners and
@@ -142,9 +143,8 @@ export class PenaltyGame {
   private aim = { x: 0.505, y: 0.24 };
   private clock = 0;
 
-  // L1 pre-chosen plan + tell, L2 roving direction
+  // L1 pre-chosen plan + tell
   private plan: { side: Side; height: Height; lean: number } | null = null;
-  private roveDir = 1;
 
   // ── lifecycle ─────────────────────────────────────────────────────────────
   init(host: HTMLElement) {
@@ -266,7 +266,6 @@ export class PenaltyGame {
     } else {
       this.plan = null;
     }
-    this.roveDir = Math.random() < 0.5 ? -1 : 1;
 
     this.phase = 'aiming';
     this.opts.onTurnReady?.({ index: this.index, level: this.level });
@@ -334,22 +333,20 @@ export class PenaltyGame {
     }
 
     if (this.level === 2) {
-      // Roves; may only dive in the direction he is already moving.
-      const committed: Side = this.roveDir < 0 ? 'left' : 'right';
-      const nearCenter = Math.abs(this.keeper.x - KEEPER_HOME.x) < 0.11;
-      if (shotSide === 'center') {
-        return { pose: this.poseFor('center', shotHeight), saved: nearCenter };
-      }
-      if (shotSide === committed) {
-        return { pose: this.poseFor(shotSide, shotHeight), saved: true };
-      }
-      // wrong-footed: he lunges the way he was going and misses
-      return { pose: this.poseFor(committed, pick<Height>(['top', 'mid', 'bottom'])), saved: false };
+      // Tricky — always reads the right side, but the height is a pure guess.
+      const guess = pick<Height>(['top', 'mid', 'bottom']);
+      return { pose: this.poseFor(shotSide, guess), saved: guess === shotHeight };
     }
 
-    // Level 3 — always the right side, but the height is a guess.
-    const guess = pick<Height>(['top', 'mid', 'bottom']);
-    return { pose: this.poseFor(shotSide, guess), saved: guess === shotHeight };
+    // Level 3 — the wall. Always picks the correct side AND stays big, smothering
+    // anything low or central. Only a ball lifted into the upper third reliably
+    // beats him, so the player has to find the top corner under pressure.
+    const SAVE_BY_HEIGHT: Record<Height, number> = { top: 0.28, mid: 0.92, bottom: 0.7 };
+    const saved = Math.random() < SAVE_BY_HEIGHT[shotHeight];
+    // He commits to the right side; when a high ball beats him he reaches but
+    // stays a touch low, so the goal reads as "lifted over the keeper".
+    const poseHeight: Height = !saved && shotHeight === 'top' ? 'mid' : shotHeight;
+    return { pose: this.poseFor(shotSide, poseHeight), saved };
   }
 
   /** Map a (side, height) dive to a concrete sprite pose (the asset choreography). */
@@ -490,14 +487,13 @@ export class PenaltyGame {
         this.keeper.x = KEEPER_HOME.x + lean * 0.03 + Math.sin(this.clock * 3) * 0.006;
         this.keeper.rot = lean * 3 + Math.sin(this.clock * 2) * 1.5;
       } else if (this.level === 2) {
-        const span = 0.205;
-        const v = Math.cos(this.clock * 1.7);
-        this.roveDir = v >= 0 ? 1 : -1;
-        this.keeper.x = KEEPER_HOME.x + Math.sin(this.clock * 1.7) * span;
-        this.keeper.rot = this.roveDir * 4;
-      } else {
+        // Tricky — square-on and twitchy, no directional tell to read.
         this.keeper.x = KEEPER_HOME.x;
-        this.keeper.rot = Math.sin(this.clock * 2) * 1.2;
+        this.keeper.rot = Math.sin(this.clock * 2.6) * 1.4;
+      } else {
+        // Elite — dead still, standing tall and centred. Gives nothing away.
+        this.keeper.x = KEEPER_HOME.x;
+        this.keeper.rot = Math.sin(this.clock * 1.4) * 0.7;
       }
       this.reticle.style.opacity = '0.92';
     }

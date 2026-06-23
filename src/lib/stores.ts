@@ -7,9 +7,31 @@
 import { derived, writable } from 'svelte/store';
 import { rewardForGoals, teamById, TOTAL_PENALTIES, type RewardTier, type Team } from './config';
 
-export type Screen = 'hero' | 'intro' | 'game' | 'results';
+export type Screen = 'hero' | 'intro' | 'game' | 'results' | 'leaderboard';
 
 export type ShotResult = 'goal' | 'saved' | 'missed';
+
+/** A saved leaderboard entry. */
+export interface LeaderboardEntry {
+  id: string;
+  name: string;
+  goals: number;
+  total: number;
+  team: string;
+  date: number; // epoch ms
+}
+
+const LEADERBOARD_KEY = 'penalty-cup-leaderboard';
+
+function loadLeaderboard(): LeaderboardEntry[] {
+  if (typeof localStorage === 'undefined') return [];
+  try {
+    const raw = localStorage.getItem(LEADERBOARD_KEY);
+    return raw ? (JSON.parse(raw) as LeaderboardEntry[]) : [];
+  } catch {
+    return [];
+  }
+}
 
 export const screen = writable<Screen>('hero');
 
@@ -27,6 +49,37 @@ export const shotHistory = writable<ShotResult[]>([]);
 
 /** Global mute toggle (muted by default to respect autoplay policies). */
 export const muted = writable<boolean>(true);
+
+/** Persisted leaderboard, ranked high→low. Survives reloads via localStorage. */
+export const leaderboard = writable<LeaderboardEntry[]>(loadLeaderboard());
+
+leaderboard.subscribe((entries) => {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem(LEADERBOARD_KEY, JSON.stringify(entries));
+  } catch {
+    /* storage full / blocked — leaderboard simply won't persist */
+  }
+});
+
+/**
+ * Save a score to the leaderboard and return the created entry (so the UI can
+ * highlight it). Entries are kept sorted by goals desc, then earliest first.
+ */
+export function saveScore(name: string, goals: number, total: number, team: string): LeaderboardEntry {
+  const entry: LeaderboardEntry = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    name: name.trim().slice(0, 20) || 'Anonymous',
+    goals,
+    total,
+    team,
+    date: Date.now()
+  };
+  leaderboard.update((list) =>
+    [...list, entry].sort((a, b) => b.goals - a.goals || a.date - b.date)
+  );
+  return entry;
+}
 
 /** Resolved selected team object. */
 export const selectedTeam = derived<typeof selectedTeamId, Team | undefined>(

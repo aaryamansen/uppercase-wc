@@ -1,8 +1,11 @@
 <script lang="ts">
   import { TEAMS, type Team } from '$lib/config';
   import { screen, selectedTeamId } from '$lib/stores';
+  import { track } from '$lib/analytics';
 
   function choose(team: Team) {
+    // Record which bag was picked so picks-per-bag show up in Vercel Analytics.
+    track('bag_selected', { bag: team.bag.name, team: team.name, teamId: team.id });
     selectedTeamId.set(team.id);
     screen.set('intro');
   }
