@@ -51,28 +51,28 @@ export const TEAMS: Team[] = [
     name: 'Germany',
     tagline: 'Die Mannschaft',
     colorway: { c1: '#141414', c2: '#DD0000', c3: '#FFCE00' },
-    bag: { name: 'Kicks Black', image: '/assets/bags/germany-2.png', accent: '#FFCE00' }
+    bag: { name: 'Kicks Black', image: '/assets/bags/germany-2.webp', accent: '#FFCE00' }
   },
   {
     id: 'brazil',
     name: 'Brazil',
     tagline: 'Seleção · Samba flair',
     colorway: { c1: '#009C3B', c2: '#FFDF00', c3: '#002776' },
-    bag: { name: 'Kicks Yellow', image: '/assets/bags/brazil-2.png', accent: '#FFDF00' }
+    bag: { name: 'Kicks Yellow', image: '/assets/bags/brazil-2.webp', accent: '#FFDF00' }
   },
   {
     id: 'argentina',
     name: 'Argentina',
     tagline: 'La Albiceleste',
     colorway: { c1: '#74ACDF', c2: '#FFFFFF', c3: '#F6B40E' },
-    bag: { name: 'Kicks Blue', image: '/assets/bags/argentina-2.png', accent: '#74ACDF' }
+    bag: { name: 'Kicks Blue', image: '/assets/bags/argentina-2.webp', accent: '#74ACDF' }
   },
   {
     id: 'portugal',
     name: 'Portugal',
     tagline: 'Seleção das Quinas',
     colorway: { c1: '#006600', c2: '#FF0000', c3: '#FFD700' },
-    bag: { name: 'Kicks Red', image: '/assets/bags/portugal-2.png', accent: '#E4080A' }
+    bag: { name: 'Kicks Red', image: '/assets/bags/portugal-2.webp', accent: '#E4080A' }
   }
 ];
 

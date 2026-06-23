@@ -4,7 +4,6 @@
   import ScreenHero from '$lib/components/ui/ScreenHero.svelte';
   import ScreenIntro from '$lib/components/ui/ScreenIntro.svelte';
   import ScreenResults from '$lib/components/ui/ScreenResults.svelte';
-  import ScreenLeaderboard from '$lib/components/ui/ScreenLeaderboard.svelte';
   import GameCanvas from '$lib/components/game/GameCanvas.svelte';
 
   const team = $derived($selectedTeam);
@@ -25,8 +24,6 @@
           <ScreenIntro />
         {:else if $screen === 'results'}
           <ScreenResults />
-        {:else if $screen === 'leaderboard'}
-          <ScreenLeaderboard />
         {:else}
           <ScreenHero />
         {/if}

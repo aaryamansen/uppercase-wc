@@ -8,3 +8,6 @@ node_modules
 .DS_Store
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Pre-optimization image originals (large; not served, not committed)
+/original-assets

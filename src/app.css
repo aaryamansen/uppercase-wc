@@ -62,7 +62,7 @@ button {
 }
 
 /* Branded backdrop for every non-game UI screen (bag selector, intro, coupon,
- * leaderboard). A dark scrim over bg2.png keeps the patterned art subtle and the
+ * leaderboard). A dark scrim over bg2.webp keeps the patterned art subtle and the
  * cream/sand text readable. The in-game scene uses the pitch art instead. */
 .ui-bg {
   background-image:
@@ -72,7 +72,7 @@ button {
       rgba(8, 11, 24, 0.72) 55%,
       rgba(8, 11, 24, 0.9) 100%
     ),
-    url('/assets/bg2.png');
+    url('/assets/bg2.webp');
   background-repeat: no-repeat, no-repeat;
   background-position: center top, center top;
   background-size: cover, cover;

@@ -11,16 +11,18 @@
   }
 </script>
 
-<section class="flex min-h-[100dvh] flex-col px-5 pb-8 pt-[max(28px,env(safe-area-inset-top))]">
-  <header class="mb-3 mt-2 text-center">
-    <h1 class="font-display text-4xl font-extrabold leading-none tracking-tight text-cream">
+<section class="flex min-h-[100dvh] flex-col px-5 pb-[max(20px,env(safe-area-inset-bottom))] pt-[max(36px,env(safe-area-inset-top))]">
+  <header class="text-center">
+    <h1 class="font-display text-4xl font-extrabold leading-[0.95] tracking-tight text-cream">
       Carry Your Colours
     </h1>
-    <p class="mt-2 text-xl text-sand/80">And shoot your way to a discount.</p>
+    <p class="mx-auto mt-3 max-w-[15rem] text-lg font-semibold leading-snug text-sand/85">
+      And score penalty kicks to earn a discount.
+    </p>
   </header>
 
   <div class="flex flex-1 flex-col justify-center">
-    <p class="mb-5 text-center text-base text-sand/60">Pick your favourite Kicks to start.</p>
+    <p class="mb-5 text-center text-lg text-sand/70">Pick your favourite Kicks to start</p>
     <div class="grid grid-cols-2 gap-3">
     {#each TEAMS as team (team.id)}
       <button
@@ -47,4 +49,7 @@
     </div>
   </div>
 
+  <footer class="mt-8 flex justify-center">
+    <img src="/assets/whitelogo.png" alt="uppercase" class="h-11 w-auto opacity-95" loading="eager" />
+  </footer>
 </section>
